@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hậu Béo Quán - Danh Sách Sản Phẩm (ES6 Assignment)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .badge-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body class="bg-amber-50/40 min-h-screen flex flex-col text-gray-800">
+    <header class="bg-amber-600 text-white shadow-lg sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white text-amber-600 p-2.5 rounded-full shadow-md text-xl">
+                    <i class="fa-solid font-bold fa-utensils"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold tracking-tight">Hậu Béo Quán</h1>
+                    <p class="text-xs text-amber-100 font-medium">Ẩm Thực Đậm Đà - Ăn Là Thỏa Mãn</p>
+                </div>
+            </div>
+
+            <!-- Quick Cart Button (Mobile & Header summary) -->
+            <button id="open-cart-btn" class="relative bg-amber-700 hover:bg-amber-800 text-white font-semibold py-2 px-4 rounded-xl flex items-center gap-2 transition-all shadow-md active:scale-95">
+                <i class="fa-solid fa-cart-shopping text-lg"></i>
+                <span class="hidden sm:inline">Giỏ hàng</span>
+                <span id="cart-badge-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 flex-grow w-full">
+        <!-- BANNER -->
+        <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-6 sm:p-8 text-white shadow-xl mb-8 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-center md:text-left">
+                <span class="bg-amber-700/60 text-amber-100 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Đặc Sản Hậu Béo</span>
+                <h2 class="text-3xl sm:text-4xl font-black">Thực Đơn Món Ngon Nóng Hổi</h2>
+                <p class="text-amber-100 max-w-xl text-sm sm:text-base">Chào mừng quý khách đến với Hậu Béo Quán! Chọn ngay các món ăn hấp dẫn bên dưới để thưởng thức bữa ăn ngon miệng nhất.</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 text-center flex-shrink-0">
+                <p class="text-xs font-medium text-amber-100">Giao hàng cực nhanh</p>
+                <p class="text-lg font-bold text-white"><i class="fa-solid fa-clock mr-1"></i> 15 - 30 Phút</p>
+            </div>
+        </div>
+        <!-- MAIN LAYOUT: PRODUCT CATALOG + CART SIDEBAR -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <!-- PRODUCT CATALOG (Left 2 Columns) -->
+            <section class="lg:col-span-2 space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fa-solid fa-bowl-rice text-amber-600"></i> Danh Sách Món Ăn
+                    </h3>
+                    <span id="product-count" class="text-xs font-semibold text-gray-500 bg-gray-200 px-2.5 py-1 rounded-full">0 món ăn</span>
+                </div>
+
+                <!-- Product Grid List -->
+                <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Products will be dynamically inserted here using ES6 Template Literals -->
+                </div>
+            </section>
+
+            <!-- CART SIDEBAR (Right 1 Column) -->
+            <section class="bg-white rounded-2xl shadow-xl border border-amber-100 p-6 sticky top-24">
+                <div class="flex justify-between items-center pb-4 border-b border-gray-100">
+                    <h3 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <i class="fa-solid fa-basket-shopping text-amber-600"></i> Giỏ Hàng Của Bạn
+                    </h3>
+                    <button id="clear-cart-btn" class="text-xs text-red-500 hover:text-red-700 font-medium transition-colors hidden">
+                        <i class="fa-regular fa-trash-can mr-1"></i> Xóa tất cả
+                    </button>
+                </div>
+
+                <!-- Cart Items Container -->
+                <div id="cart-items" class="py-4 space-y-3 max-h-80 overflow-y-auto min-h-[160px] flex flex-col justify-center">
+                    <!-- Rendered dynamically -->
+                </div>
+
+                <!-- Cart Summary & Order Section -->
+                <div class="pt-4 border-t border-gray-100 space-y-3">
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>Tạm tính:</span>
+                        <span id="subtotal-price" class="font-medium text-gray-800">0đ</span>
+                    </div>
+                    <div class="flex justify-between text-sm text-gray-600">
+                        <span>Phí giao hàng:</span>
+                        <span class="font-medium text-green-600">Miễn phí</span>
+                    </div>
+                    <div class="flex justify-between text-base font-bold text-gray-900 pt-2 border-t border-dashed">
+                        <span>Tổng thanh toán:</span>
+                        <span id="total-price" class="text-amber-600 text-xl">0đ</span>
+                    </div>
+
+                    <!-- Checkout Button -->
+                    <button id="checkout-btn" disabled class="w-full mt-4 bg-amber-600 hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95">
+                        <span id="checkout-btn-text">Đặt Hàng Ngay</span>
+                        <i id="checkout-spinner" class="fa-solid fa-circle-notch fa-spin hidden"></i>
+                    </button>
+                </div>
+            </section>
+
+        </div>
+    </div>
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <footer class="bg-gray-900 text-gray-400 py-6 mt-12 text-center text-sm border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="font-semibold text-gray-300">Hậu Béo Quán © 2026 - Hương vị đậm đà, ăn là mê!</p>
+        </div>
+    </footer>
+
+    <script>
+        const initialProducts = [
+            {
+                id: 1,
+                name: "Cơm Tấm Sà bì chưởng",
+                price: 65000,
+                image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&auto=format&fit=crop&q=80",
+                description: "Sườn nướng mật ong mềm thơm, chả trứng béo ngậy kèm nước mắm chua ngọt chuẩn vị."
+            },
+            {
+                id: 2,
+                name: "Bún Đậu Mắm Tôm ",
+                price: 45000,
+                image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=500&auto=format&fit=crop&q=80",
+                description: "Đầy đủ chả cốm, thịt chân giò, dồi sụn chiên giòn và mắm tôm pha chuẩn vị Hậu Béo."
+            },
+            {
+                id: 3,
+                name: "Phở Bò Tái Nạm Gầu Gân",
+                price: 50000,
+                image: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=500&auto=format&fit=crop&q=80",
+                description: "Nước dùng hầm xương 24h ngọt thanh, thịt bò tươi mềm dai vừa tới."
+            },
+            {
+                id: 4,
+                name: "Gà Nướng Mật Ong Nguyên Con",
+                price: 180000,
+                image: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=500&auto=format&fit=crop&q=80",
+                description: "Gà thả vườn nướng than hồng giòn da, thấm vị đậm đà."
+            },
+            {
+                id: 5,
+                name: "Bánh Mỳ Kẹp Thịt Nướng Special",
+                price: 30000,
+                image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&auto=format&fit=crop&q=80",
+                description: "Vỏ bánh giòn rụm, nhân thịt nướng thơm lừng kết hợp nộm chua ngọt và sốt đặc chế."
+            },
+            {
+                id: 6,
+                name: "Trà Tắc Xí Muội Khổng Lồ",
+                price: 25000,
+                image: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80",
+                description: "Giải nhiệt cực đã, vị chua ngọt hài hòa cùng xí muội mặn mặn đậm đà."
+            }
+        ];
+
+        let cartState = [];
+
+        const DEFAULT_IMAGE = "https://placehold.co/500x350/f59e0b/ffffff?text=H%E1%BA%AEU+B%C3%89O+QU%C3%81N";
+        const formatCurrency = (amount = 0, currency = 'đ') => {
+            const formattedNumber = new Intl.NumberFormat('vi-VN').format(amount);
+            return `${formattedNumber}${currency}`;
+        };
+        const calculateTotal = (...prices) => {
+            return prices.reduce((total, currentPrice) => total + currentPrice, 0);
+        };
+        const productListEl = document.getElementById('product-list');
+        const productCountEl = document.getElementById('product-count');
+        const cartItemsEl = document.getElementById('cart-items');
+        const cartBadgeCountEl = document.getElementById('cart-badge-count');
+        const subtotalPriceEl = document.getElementById('subtotal-price');
+        const totalPriceEl = document.getElementById('total-price');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const checkoutBtnText = document.getElementById('checkout-btn-text');
+        const checkoutSpinner = document.getElementById('checkout-spinner');
+        const clearCartBtn = document.getElementById('clear-cart-btn');
+        const toastContainer = document.getElementById('toast-container');
+        const renderProducts = (products = []) => {
+            productCountEl.textContent = `${products.length} món ăn`;
+
+            if (products.length === 0) {
+                productListEl.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-500 bg-white rounded-2xl border border-dashed border-gray-300">
+                        <i class="fa-solid fa-utensils text-4xl mb-3 text-amber-400"></i>
+                        <p class="font-semibold">Chưa có món ăn nào trong thực đơn.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            productListEl.innerHTML = products.map((product) => {
+                const { id, name = "Món Ăn Chưa Đặt Tên", price = 0, image, description = "Món ăn ngon đậm đà từ Hậu Béo Quán." } = product;
+
+                const imageUrl = image && image.trim() !== "" ? image : DEFAULT_IMAGE;
+                
+                const formattedPrice = formatCurrency(price);
+
+                return `
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-amber-100 flex flex-col group">
+                        <div class="relative overflow-hidden h-48 bg-gray-100">
+                            <img 
+                                src="${imageUrl}" 
+                                alt="${name}" 
+                                loading="lazy"
+                                onerror="this.onerror=null; this.src='${DEFAULT_IMAGE}';"
+                                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                            <div class="absolute top-3 right-3 bg-amber-600/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">
+                                ${formattedPrice}
+                            </div>
+                        </div>
+                        <div class="p-5 flex flex-col flex-grow justify-between space-y-4">
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-lg group-hover:text-amber-600 transition-colors line-clamp-1">${name}</h4>
+                                <p class="text-xs text-gray-500 mt-1.5 line-clamp-2 leading-relaxed">${description}</p>
+                            </div>
+                            <div class="pt-2 flex items-center justify-between border-t border-gray-50">
+                                <span class="text-xs font-semibold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-md">Hot Choice</span>
+                                <button 
+                                    onclick="addToCart(${id})" 
+                                    class="bg-amber-600 hover:bg-amber-700 text-white font-medium text-xs py-2 px-3.5 rounded-xl transition-colors flex items-center gap-1.5 active:scale-95 shadow-md shadow-amber-600/20"
+                                >
+                                    <i class="fa-solid fa-plus"></i> Thêm món
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+        const renderCart = () => {
+            if (cartState.length === 0) {
+                cartItemsEl.innerHTML = `
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fa-solid fa-basket-shopping text-3xl mb-2 text-gray-300"></i>
+                        <p class="text-sm">Giỏ hàng đang trống</p>
+                        <p class="text-xs text-gray-400 mt-1">Hãy chọn món ngon bạn thích nhé!</p>
+                    </div>
+                `;
+                cartBadgeCountEl.textContent = "0";
+                subtotalPriceEl.textContent = formatCurrency(0);
+                totalPriceEl.textContent = formatCurrency(0);
+                checkoutBtn.disabled = true;
+                clearCartBtn.classList.add('hidden');
+                return;
+            }
+
+            clearCartBtn.classList.remove('hidden');
+
+            const totalQuantity = cartState.reduce((sum, item) => sum + item.quantity, 0);
+            cartBadgeCountEl.textContent = totalQuantity;
+
+            cartItemsEl.innerHTML = cartState.map((item) => {
+                const { id, name, price, quantity, image } = item;
+                const itemTotal = price * quantity;
+                const imageUrl = image && image.trim() !== "" ? image : DEFAULT_IMAGE;
+
+                return `
+                    <div class="flex items-center gap-3 bg-amber-50/50 p-2.5 rounded-xl border border-amber-100/60">
+                        <img src="${imageUrl}" alt="${name}" onerror="this.src='${DEFAULT_IMAGE}'" class="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
+                        <div class="flex-grow min-w-0">
+                            <h5 class="text-xs font-bold text-gray-800 truncate">${name}</h5>
+                            <p class="text-xs text-amber-600 font-semibold">${formatCurrency(price)}</p>
+                        </div>
+                        <div class="flex items-center gap-1 bg-white border border-gray-200 rounded-lg p-1">
+                            <button onclick="updateQuantity(${id}, -1)" class="w-5 h-5 flex items-center justify-center text-xs text-gray-600 hover:bg-gray-100 rounded">
+                                <i class="fa-solid fa-minus text-[10px]"></i>
+                            </button>
+                            <span class="text-xs font-bold w-5 text-center">${quantity}</span>
+                            <button onclick="updateQuantity(${id}, 1)" class="w-5 h-5 flex items-center justify-center text-xs text-gray-600 hover:bg-gray-100 rounded">
+                                <i class="fa-solid fa-plus text-[10px]"></i>
+                            </button>
+                        </div>
+                        <button onclick="removeFromCart(${id})" class="text-gray-400 hover:text-red-500 p-1 transition-colors">
+                            <i class="fa-solid fa-xmark text-sm"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            const itemTotals = cartState.map(item => item.price * item.quantity);
+            const totalAmount = calculateTotal(...itemTotals); // Truyền bằng Spread (đi kèm Rest trong tham số hàm)
+
+            subtotalPriceEl.textContent = formatCurrency(totalAmount);
+            totalPriceEl.textContent = formatCurrency(totalAmount);
+            checkoutBtn.disabled = false;
+        };
+        const addToCart = (productId) => {
+            const product = initialProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cartState.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                // 2. REQUIREMENT: Destructuring
+                const { id, name, price, image } = product;
+
+                const cartItem = {
+                    id,
+                    name,
+                    price,
+                    image,
+                    quantity: 1
+                };
+
+                cartState.push(cartItem);
+            }
+
+            renderCart();
+            showToast(`Đã thêm "${product.name}" vào giỏ!`, 'success');
+        };
+        const updateQuantity = (productId, delta) => {
+            const item = cartState.find(i => i.id === productId);
+            if (!item) return;
+
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                removeFromCart(productId);
+            } else {
+                renderCart();
+            }
+        };
+        const removeFromCart = (productId) => {
+            const item = cartState.find(i => i.id === productId);
+            cartState = cartState.filter(i => i.id !== productId);
+            renderCart();
+            if (item) {
+                showToast(`Đã xóa "${item.name}" khỏi giỏ.`, 'info');
+            }
+        };
+        const clearCart = () => {
+            cartState = [];
+            renderCart();
+            showToast('Đã dọn dẹp giỏ hàng!', 'info');
+        };
+        const mockCheckoutAPI = (orderData) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    const isSuccess = Math.random() < 0.9;
+                    
+                    if (isSuccess && orderData.items.length > 0) {
+                        resolve({
+                            status: 200,
+                            message: "Đặt hàng thành công! Hậu Béo Quán đang chuẩn bị món ăn cho bạn.",
+                            orderId: "HBQ-" + Math.floor(100000 + Math.random() * 900000),
+                            totalAmount: orderData.totalAmount
+                        });
+                    } else {
+                        reject({
+                            status: 500,
+                            message: "Kết nối mạng không ổn định hoặc lỗi máy chủ. Vui lòng thử lại!"
+                        });
+                    }
+                }, 2000);
+            });
+        };
+        const handleCheckout = () => {
+            if (cartState.length === 0) return;
+
+            checkoutBtn.disabled = true;
+            checkoutBtnText.textContent = "Đang xử lý...";
+            checkoutSpinner.classList.remove('hidden');
+
+            const itemTotals = cartState.map(i => i.price * i.quantity);
+            const totalAmount = calculateTotal(...itemTotals);
+
+            const items = [...cartState];
+            const orderPayload = {
+                items,
+                totalAmount,
+                createdAt: new Date().toISOString()
+            };
+
+            mockCheckoutAPI(orderPayload)
+                .then((response) => {
+                    showToast(`🎉 ${response.message} (Mã đơn: ${response.orderId})`, 'success');
+                    cartState = [];
+                    renderCart();
+                })
+                .catch((error) => {
+                    showToast(`❌ ${error.message}`, 'error');
+                })
+                .finally(() => {
+                    checkoutBtnText.textContent = "Đặt Hàng Ngay";
+                    checkoutSpinner.classList.add('hidden');
+                    if (cartState.length > 0) {
+                        checkoutBtn.disabled = false;
+                    }
+                });
+        };
+
+            const showToast = (message, type = 'info') => {
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-gray-800';
+            
+            toast.className = `${bgClass} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 text-sm font-medium transition-all transform translate-y-2 opacity-0 pointer-events-auto`;
+            toast.innerHTML = `
+                <span>${message}</span>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts(initialProducts);
+            renderCart();
+            clearCartBtn.addEventListener('click', () => clearCart());
+            checkoutBtn.addEventListener('click', () => handleCheckout());
+            document.getElementById('open-cart-btn').addEventListener('click', () => {
+                cartItemsEl.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
